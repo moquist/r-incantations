@@ -5,7 +5,7 @@ reading [Data-Driven Security, by Jacobs and
 Rudis](http://www.amazon.com/Data-Driven-Security-Analysis-Visualization-Dashboards/dp/1118793722).
 
 The book uses R and the Pandas Python library, and I want to learn to use
-Incanter in parallel.
+the Clojure Incanter library in parallel.
 
 This is currently incomplete, because I'm only in chapter 4.
 

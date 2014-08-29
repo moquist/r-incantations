@@ -61,12 +61,10 @@ fig.save_figure('/tmp/pplot.png')"]
        coll))
 
 (defn read-alienvault-reputation-data []
-  (let [home (System/getProperty "user.home")
-        filepath (str home "/book/ch03/data/reputation.data")]
-    (-> filepath
-        (incanter.io/read-dataset :delim \#)
-        (incanter.core/col-names
-         ["IP" "Reliability" "Risk" "Type" "Country" "Locale" "Coords" "x"]))))
+  (-> "book-data/book/ch03/data/reputation.data"
+      (incanter.io/read-dataset :delim \#)
+      (incanter.core/col-names
+       ["IP" "Reliability" "Risk" "Type" "Country" "Locale" "Coords" "x"])))
 
 (defn ch03
   ([] (ch03 (read-alienvault-reputation-data)))
@@ -114,13 +112,11 @@ fig.save_figure('/tmp/pplot.png')"]
     (= a b)))
 
 (defn get-iana-ipv4-allocations []
-  (let [home (System/getProperty "user.home")
-        filepath (str home "/book/ch04/data/ipv4-address-space.csv")]
-    (-> filepath
-        ;; eat the headers, but don't use them because one column has a SPACE in the name and clojure.core/keyword allows this
-        (incanter.io/read-dataset :skip 1)
-        (incanter.core/col-names
-         [:Prefix :Designation :Date :Whois :Status :Note]))))
+  (-> "book-data/book/ch04/data/ipv4-address-space.csv"
+      ;; eat the headers, but don't use them because one column has a SPACE in the name and clojure.core/keyword allows this
+      (incanter.io/read-dataset :skip 1)
+      (incanter.core/col-names
+       [:Prefix :Designation :Date :Whois :Status :Note])))
 
 (defn ch04 []
   (let [iana (get-iana-ipv4-allocations)
@@ -162,11 +158,9 @@ fig.save_figure('/tmp/pplot.png')"]
                (inc i))))))
 
 (defn get-zeroaccess-data []
-  (let [home (System/getProperty "user.home")
-        filepath (str home "/book/ch05/data/zeroaccess.csv")]
-    (-> filepath
-        ;; eat the headers, but don't use them because one column has a SPACE in the name and clojure.core/keyword allows this
-        (incanter.io/read-dataset :header true))))
+  (-> "book-data/book/ch05/data/zeroaccess.csv"
+      ;; eat the headers, but don't use them because one column has a SPACE in the name and clojure.core/keyword allows this
+      (incanter.io/read-dataset :header true)))
 
 (defn ch05-1 []
   (let [za (r-incantations.core/get-zeroaccess-data)

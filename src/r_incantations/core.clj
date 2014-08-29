@@ -250,6 +250,13 @@ fig.save_figure('/tmp/pplot.png')"]
       (incanter.charts/add-function incanter.stats/pdf-gamma 0 8)
       (incanter.core/view))
 
+  ;; fails to map alaska nicely
+  (let [ak (incanter.core/$where {:region "USA" :subregion "Alaska"} world)
+        coords (incanter.core/sel ak :cols [:long :lat])
+        coords (incanter.core/to-matrix coords)
+        p (incanter.charts/scatter-plot (map first coords) (map second coords))
+        p (incanter.charts/add-polygon p coords)]
+    (incanter.core/view p))
   
   
   )

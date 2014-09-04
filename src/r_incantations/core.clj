@@ -162,6 +162,17 @@ fig.save_figure('/tmp/pplot.png')"]
       ;; eat the headers, but don't use them because one column has a SPACE in the name and clojure.core/keyword allows this
       (incanter.io/read-dataset :header true)))
 
+(defn get-state-population-data []
+  (let [spd (incanter.io/read-dataset
+             "book-data/book/ch05/data/state-internets.csv"
+             :header true)]
+    ;; lower-case the state names
+    (incanter.core/replace-column
+     :state
+     (map #(str/lower-case %)
+          (incanter.core/$ :state spd))
+     spd)))
+
 (defn ch05-1 []
   (let [za (r-incantations.core/get-zeroaccess-data)
         lat (incanter.core/$ :lat za)
@@ -184,6 +195,40 @@ fig.save_figure('/tmp/pplot.png')"]
     (-> (incanter.charts/scatter-plot lon lat)
         (incanter.charts/set-point-size 1)
         (incanter.charts/set-stroke-color java.awt.Color/gray))))
+
+(defn ch05-2
+  "Initially intended to do Listing 5-8 on p.114, but latlong2map()
+   does polygon point inclusion testing (with R's over()), and I don't
+   know (yet) of an implementation of that in Clojure that I have
+   available."
+  []
+  (let [za (get-zeroaccess-data)
+        users (get-state-population-data)]
+    ;; Oh. Now we need to test polygon inclusion, such as is described
+    ;; and represented here in C++:
+    ;; http://geomalgorithms.com/a03-_inclusion.html
+    ;; Guess we'll do that another day.
+    [za users]))
+
+(defn ch05-3
+  "Based on Listing 5-16 through 5-18"
+  [intercept?]
+  (let [relation-fn #(* 2 %)
+        input (incanter.stats/sample-normal 20000 :mean 10)
+        output (map #(incanter.stats/sample-normal 1 :mean (relation-fn %)) input)
+        _demo-dataset (incanter.core/to-dataset (incanter.core/bind-columns input output))
+        model (incanter.stats/linear-model output input :intercept intercept?)
+        _cool! (incanter.stats/predict model 42)]
+    {:model model}
+    (comment
+      :graph (-> (incanter.charts/scatter-plot input output)
+                 (incanter.charts/add-lines input (:fitted model)))
+      :residuals-quantiles (incanter.stats/quantile (:residuals model))
+      :intercept (-> model :coefs first)
+      :intercept2 (incanter.stats/predict model 0)
+      :confint-intercept (-> model :coefs-ci first)
+      :confint-input-coef (-> model :coefs-ci last)
+      :adj-r-square model)))
 
 (comment
   ;; hist(rnorm(100))
@@ -251,10 +296,10 @@ fig.save_figure('/tmp/pplot.png')"]
       (incanter.core/view))
 
   ;; fails to map alaska nicely
-  (let [ak (incanter.core/$where {:region "USA" :subregion "Alaska"} world)
+  (let [ak (incanter.core/$where {:region "USA" :subregion "Alaska" :group 25} world)
         coords (incanter.core/sel ak :cols [:long :lat])
         coords (incanter.core/to-matrix coords)
-        p (incanter.charts/scatter-plot (map first coords) (map second coords))
+        p (incanter.charts/xy-plot (map first coords) (map second coords))
         p (incanter.charts/add-polygon p coords)]
     (incanter.core/view p))
   

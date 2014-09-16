@@ -34,9 +34,9 @@ I found it useful to have r-incantations code/REPL open in one terminal, and the
 following files from the [Incanter repo](https://github.com/incanter/incanter)
 open in another (so I could easily toggle back and forth):
 
-1 modules/incanter-charts/src/incanter/charts.clj
-1 modules/incanter-core/src/incanter/stats.clj
-1 modules/incanter-core/src/incanter/core.clj
+1. modules/incanter-charts/src/incanter/charts.clj
+1. modules/incanter-core/src/incanter/stats.clj
+1. modules/incanter-core/src/incanter/core.clj
 
 ## License
 

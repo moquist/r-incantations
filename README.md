@@ -12,8 +12,8 @@ Rudis](http://www.amazon.com/Data-Driven-Security-Analysis-Visualization-Dashboa
 Various bits of this code currently assume you have downloaded the
 code and data files for the book and placed them in this repo's top
 directory under book-data. If you've got /bin/sh, curl, and unzip (or
-you aren't sure), you can execute the '''get-book-data.sh''' script to
-do this automatically.
+you aren't sure but want to try it anyhow), you can execute the
+'''get-book-data.sh''' script to do this automatically.
 
 Generally speaking, on Linux or Mac OSX you should be able to do this:
 ```shell
@@ -24,10 +24,19 @@ sh get-book-data.sh
 The book uses R and the Pandas Python library, and I want to learn to use
 the Clojure Incanter library in parallel.
 
-This is currently incomplete, because I'm only in chapter 5.
+This is currently incomplete, because.
 
 Hopefully, someday, I'll have a chance to finish this (whatever that means!),
 clean it all up, and add some mo/better documentation.
+
+## Tips ##
+I found it useful to have r-incantations code/REPL open in one terminal, and the
+following files from the [Incanter repo](https://github.com/incanter/incanter)
+open in another (so I could easily toggle back and forth):
+
+1 modules/incanter-charts/src/incanter/charts.clj
+1 modules/incanter-core/src/incanter/stats.clj
+1 modules/incanter-core/src/incanter/core.clj
 
 ## License
 

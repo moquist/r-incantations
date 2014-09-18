@@ -138,7 +138,12 @@ fig.save_figure('/tmp/pplot.png')"]
     {:iana iana
      :av av}))
 
-(defn r-like-table [coll]
+(defn contingency-table
+  "Calculate a basic contingency table for the input collection, which
+   may contain items of any type.
+   C.f. incanter.stats/tabulate, which does more but is limited to
+   numeric matrices."
+  [coll]
   (let [n (incanter.core/nrow coll)
         p (incanter.core/ncol coll)]
     (loop [tab {} i (int 0)]

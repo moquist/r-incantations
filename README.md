@@ -7,13 +7,14 @@ Some people don't like the presence of a user.clj. If you're one of those people
 This is a loose and currently undocumented collection of code bits written while
 reading [Data-Driven Security, by Jacobs and
 Rudis](http://www.amazon.com/Data-Driven-Security-Analysis-Visualization-Dashboards/dp/1118793722).
+I recommend the book.
 
 ## Do I need to download stuff from the book to make this code work at all? ##
 Various bits of this code currently assume you have downloaded the
 code and data files for the book and placed them in this repo's top
 directory under book-data. If you've got /bin/sh, curl, and unzip (or
 you aren't sure but want to try it anyhow), you can execute the
-'''get-book-data.sh''' script to do this automatically.
+```get-book-data.sh``` script to do this automatically.
 
 Generally speaking, on Linux or Mac OSX you should be able to do this:
 ```shell
@@ -30,7 +31,7 @@ Hopefully, someday, I'll have a chance to finish this (whatever that means!),
 clean it all up, and add some mo/better documentation.
 
 ## Tips ##
-I found it useful to have r-incantations code/REPL open in one terminal, and the
+I found it useful to have my working code/REPL open in one terminal, and the
 following files from the [Incanter repo](https://github.com/incanter/incanter)
 open in another (so I could easily toggle back and forth):
 

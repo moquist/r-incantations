@@ -36,7 +36,8 @@
     (sh "R" "--no-save" "-q" :in r)))
 
 (defn plot-summed-vectors-pandas
-  "Doesn't work. On my system, Canopy's wx dependency is the issue."
+  "Doesn't work. On my system, Canopy's wx dependency is the issue.
+   I'm not going to bother chasing this down."
   []
   (let [p "
 import numpy as np
@@ -50,16 +51,9 @@ fig.save_figure('/tmp/pplot.png')"]
     (spit "/tmp/a.py" p)
     ))
 
-(defn read-strings1 [coll]
-  (map (fn read-strings- [t]
-         (try
-           (let [s (edn/read-string t)]
-             (if (symbol? s)
-               (str s)
-               s))
-           (catch Exception e t)))
-       coll))
-
+;;----------------------------
+;; Data-Driven Security ch03
+;;----------------------------
 (defn read-alienvault-reputation-data []
   (-> "book-data/book/ch03/data/reputation.data"
       (incanter.io/read-dataset :delim \#)
@@ -113,7 +107,8 @@ fig.save_figure('/tmp/pplot.png')"]
 
 (defn get-iana-ipv4-allocations []
   (-> "book-data/book/ch04/data/ipv4-address-space.csv"
-      ;; eat the headers, but don't use them because one column has a SPACE in the name and clojure.core/keyword allows this
+      ;; Eat the headers, but don't use them because one column has a
+      ;; space in the name and clojure.core/keyword allows this. (BAH!)
       (incanter.io/read-dataset :skip 1)
       (incanter.core/col-names
        [:Prefix :Designation :Date :Whois :Status :Note])))
@@ -126,7 +121,8 @@ fig.save_figure('/tmp/pplot.png')"]
                    (incanter.core/$ :Prefix iana))
               iana)
         ;; We don't technically need a derived column, here; we just
-        ;; need a seq of all the IP prefixes in av. But this is one way to do it.
+        ;; need a seq of all the IP prefixes in av. But this is one
+        ;; way to do it.
         av (incanter.core/add-derived-column
             :IP.Prefix
             ["IP"]
@@ -157,9 +153,11 @@ fig.save_figure('/tmp/pplot.png')"]
                    (assoc tab row (inc cnt))))
                (inc i))))))
 
+;;----------------------------
+;; Data-Driven Security ch05
+;;----------------------------
 (defn get-zeroaccess-data []
   (-> "book-data/book/ch05/data/zeroaccess.csv"
-      ;; eat the headers, but don't use them because one column has a SPACE in the name and clojure.core/keyword allows this
       (incanter.io/read-dataset :header true)))
 
 (defn get-state-population-data []
@@ -183,10 +181,8 @@ fig.save_figure('/tmp/pplot.png')"]
         incanter.core/view)))
 
 (defn get-world []
-  (let [filepath "world.csv"]
-    (-> filepath
-        ;; eat the headers, but don't use them because one column has a SPACE in the name and clojure.core/keyword allows this
-        (incanter.io/read-dataset :header true))))
+  (-> "world.csv"
+      (incanter.io/read-dataset :header true)))
 
 (defn world-map []
   (let [world (get-world)
@@ -211,7 +207,7 @@ fig.save_figure('/tmp/pplot.png')"]
     [za users]))
 
 (defn ch05-3
-  "Based on Listing 5-16 through 5-18"
+  "See listings 5-16 through 5-18"
   [intercept?]
   (let [relation-fn #(* 2 %)
         input (incanter.stats/sample-normal 20000 :mean 10)

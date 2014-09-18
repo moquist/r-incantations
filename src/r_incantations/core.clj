@@ -301,28 +301,45 @@ fig.save_figure('/tmp/pplot.png')"]
                             "Infected" tr-inf-proc-mean tr-inf-mem-mean
                             "Normal" tr-norm-proc-mean tr-norm-mem-mean)
                    test-data)
-        good-guesses (-> (incanter.core/query-dataset
-                          test-data
-                          ;; Is there a better way to check for
-                          ;; equality between two columns?
-                          (fn [row] (= (row :state) (row :prediction))))
-                         :rows
-                         count)
-        accuracy (-> good-guesses
+        good-guesses-cnt (-> (incanter.core/query-dataset
+                              test-data
+                              ;; Is there a better way to check for
+                              ;; equality between two columns?
+                              (fn [row] (= (row :state) (row :prediction))))
+                             :rows
+                             count)
+        accuracy (-> good-guesses-cnt
                      (/ (incanter.core/nrow test-data))
                      float)]
-    accuracy
-    #_
-    {:tr-inf-proc-mean tr-inf-proc-mean
-     :tr-inf-mem-mean tr-inf-mem-mean
-     :tr-norm-proc-mean tr-norm-proc-mean
-     :tr-norm-mem-mean tr-norm-mem-mean}
-    #_
-    {:n n
-     :test-size test-size
-     :test-sel test-sel
-     :test-data test-data
-     :training-data training-data}))
+    accuracy))
+
+(defn ch09-ml-test [data test-sel]
+  (let [test-data (-> (incanter.core/sel data :rows [test-sel] :cols [:proc :mem :state])
+                      :rows
+                      first)
+        training-data (incanter.core/sel data :except-rows [test-sel])
+        tr-inf-proc-mean (col-mean training-data "Infected" :proc)
+        tr-inf-mem-mean (col-mean training-data "Infected" :mem)
+        tr-norm-proc-mean (col-mean training-data "Normal" :proc)
+        tr-norm-mem-mean (col-mean training-data "Normal" :mem)]
+    (= (:state test-data)
+       (compare-euclidian-distance
+        "Infected" tr-inf-proc-mean tr-inf-mem-mean
+        "Normal" tr-norm-proc-mean tr-norm-mem-mean
+        (:proc test-data) (:mem test-data)))))
+
+(defn ch09-ml-toy2
+  "Same Euclidian distance basis as ch09-ml-toy, but does
+   leave-one-out cross-validation.
+   http://en.wikipedia.org/wiki/Cross-validation_(statistics)#Leave-one-out_cross-validation"
+  []
+  (let [memproc (read-memproc-data)
+        n (count (:rows memproc))
+        test-size (dec n)
+        tf-results (-> (for [test-sel (range n)]
+                         (ch09-ml-test memproc test-sel))
+                       contingency-table)]
+    (float (/ (tf-results true) n))))
 
 
 (comment

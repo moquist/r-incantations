@@ -392,6 +392,12 @@ fig.save_figure('/tmp/pplot.png')"]
         p (incanter.charts/xy-plot (map first coords) (map second coords))
         p (incanter.charts/add-polygon p coords)]
     (incanter.core/view p))
+
+  ;; from incanter docs for add-lines
+  (doto (incanter.charts/histogram (incanter.stats/sample-normal 1000) :density true)
+    (incanter.charts/add-lines (range -3 3 0.05) (incanter.stats/pdf-normal (range -3 3 0.05)))
+    incanter.core/view)
+  
   
   
   )

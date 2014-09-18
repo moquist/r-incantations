@@ -226,6 +226,100 @@ fig.save_figure('/tmp/pplot.png')"]
       :confint-input-coef (-> model :coefs-ci last)
       :adj-r-square model)))
 
+
+;;----------------------------
+;; Data-Driven Security ch09
+;;----------------------------
+
+(defn read-memproc-data []
+  (-> "book-data/book/ch09/data/memproc.csv"
+      (incanter.io/read-dataset :header true)))
+
+(defn ch09-01
+  "See listings 9-1 and 9-2 in the book"
+  []
+  (let [memproc (read-memproc-data)
+        summary (incanter.stats/summary memproc)
+        proc (incanter.core/$ :proc memproc)
+        mem (incanter.core/$ :mem memproc)
+        state (incanter.core/$ :state memproc)
+        chart (incanter.charts/scatter-plot proc mem :group-by state)]
+    (incanter.core/view chart)))
+
+(defn col-mean [data state col]
+  (incanter.stats/mean
+   (incanter.core/sel
+    (incanter.core/$where {:state state} data)
+    :cols col)))
+
+(defn r-test-sel []
+  ;; To compare to the book, here's the same test-sel that R generates with set.seed(1492)
+  (map dec [69 54 46 27 13 2 206 123 94 184 153 151 245 240 122 238 29 80 152 209 145 87 30 135 21 207 130 124 76 212 33 214 182 47 210 150 89 24 6 65 155 163 34 230 90 49 172 213 22 244 234 225 63 170 134 142 224 48 180 154 199 84 247 99 38 211 233 175 226 223 86 185 137 37 108 197 45 203 177 88 116 202]))
+
+(defn euclidian-distance
+  "Returns the Euclidian distance from (ax,ay) to (bx,by)."
+  [ax ay bx by]
+  (let [ax-bx (- ax bx)
+        ay-by (- ay by)
+        ax-bx-sq (incanter.core/sq ax-bx)
+        ay-by-sq (incanter.core/sq ay-by)]
+    (incanter.core/sqrt (+ ax-bx-sq ay-by-sq))))
+
+(defn compare-euclidian-distance
+  "If the Euclidian distance from (x,y) to (ax,ay) is less than the
+   Euclidian distance from (x,y) to (bx,by), return a, else return b."
+  [a ax ay b bx by x y]
+  (let [a-dist (euclidian-distance ax ay x y)
+        b-dist (euclidian-distance bx by x y)]
+    (if (<= a-dist b-dist) a b)))
+
+(defn ch09-ml-toy
+  "See listings 9-3 through 9-6.
+   Use r? true to use the same test selection that R generates."
+  [& {:keys [r?] :or [false]}]
+  (let [memproc (read-memproc-data)
+        n (count (:rows memproc))
+        test-size (int (/ n 3))
+        test-sel (if r?
+                   (r-test-sel)
+                   (take test-size (incanter.stats/sample (range n) :replacement false))) 
+        test-data (incanter.core/sel memproc :rows test-sel)
+        training-data (incanter.core/sel memproc :except-rows test-sel)
+        tr-inf-proc-mean (col-mean training-data "Infected" :proc)
+        tr-inf-mem-mean (col-mean training-data "Infected" :mem)
+        tr-norm-proc-mean (col-mean training-data "Normal" :proc)
+        tr-norm-mem-mean (col-mean training-data "Normal" :mem)
+        test-data (incanter.core/add-derived-column
+                   :prediction
+                   [:proc :mem]
+                   (partial compare-euclidian-distance
+                            "Infected" tr-inf-proc-mean tr-inf-mem-mean
+                            "Normal" tr-norm-proc-mean tr-norm-mem-mean)
+                   test-data)
+        good-guesses (-> (incanter.core/query-dataset
+                          test-data
+                          ;; Is there a better way to check for
+                          ;; equality between two columns?
+                          (fn [row] (= (row :state) (row :prediction))))
+                         :rows
+                         count)
+        accuracy (-> good-guesses
+                     (/ (incanter.core/nrow test-data))
+                     float)]
+    accuracy
+    #_
+    {:tr-inf-proc-mean tr-inf-proc-mean
+     :tr-inf-mem-mean tr-inf-mem-mean
+     :tr-norm-proc-mean tr-norm-proc-mean
+     :tr-norm-mem-mean tr-norm-mem-mean}
+    #_
+    {:n n
+     :test-size test-size
+     :test-sel test-sel
+     :test-data test-data
+     :training-data training-data}))
+
+
 (comment
   ;; hist(rnorm(100))
   (incanter.core/view (incanter.charts/histogram (incanter.stats/sample-normal 100)))

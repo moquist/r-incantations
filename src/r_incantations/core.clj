@@ -138,26 +138,6 @@ fig.save_figure('/tmp/pplot.png')"]
     {:iana iana
      :av av}))
 
-(defn contingency-table
-  "Calculate a basic contingency table for the input collection, which
-   may contain items of any type.
-   C.f. incanter.stats/tabulate, which does more but is limited to
-   numeric matrices."
-  [coll]
-  (let [n (incanter.core/nrow coll)
-        p (incanter.core/ncol coll)]
-    (loop [tab {} i (int 0)]
-      (if (= i n)
-        tab
-        (recur (let [row (if (> p 1)
-                           (incanter.core/to-list (nth coll i))
-                           (nth coll i))
-                     cnt (get tab row)]
-                 (if (nil? cnt)
-                   (assoc tab row 1)
-                   (assoc tab row (inc cnt))))
-               (inc i))))))
-
 ;;----------------------------
 ;; Data-Driven Security ch05
 ;;----------------------------
@@ -338,7 +318,7 @@ fig.save_figure('/tmp/pplot.png')"]
         test-size (dec n)
         tf-results (-> (for [test-sel (range n)]
                          (ch09-ml-test memproc test-sel))
-                       contingency-table)]
+                       frequencies)]
     (float (/ (tf-results true) n))))
 
 

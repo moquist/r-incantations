@@ -304,7 +304,7 @@ fig.save_figure('/tmp/pplot.png')"]
 
 (defn ch09-ml-null-model
   "This is a null-model for the Euclidian-distance ML algorithm from
-  the book, prepped for leave-one-out-cross-validation.
+  the book, prepped for leave-one-out cross-validation.
 
    * Use with ch09-ml-validate.
    * Assumes test-sel is a single row index.
@@ -339,7 +339,7 @@ fig.save_figure('/tmp/pplot.png')"]
 
 (defn ch09-ml-book
   "This is same Euclidian-distance ML algorithm from the book, prepped
-   for leave-one-out-cross-validation.
+   for leave-one-out cross-validation.
 
    * Use with ch09-ml-validate.
    * Assumes test-sel is a single row index.
@@ -362,7 +362,7 @@ fig.save_figure('/tmp/pplot.png')"]
         (:proc test-data) (:mem test-data)))))
 
 (defn ch09-ml-validate
-  "Does leave-one-out-cross-validation on memproc data.
+  "Does leave-one-out cross-validation on memproc data.
    http://en.wikipedia.org/wiki/Cross-validation_(statistics)#Leave-one-out_cross-validation.
 
    ex: (ch09-ml-validate ch09-ml-null-model)

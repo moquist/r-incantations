@@ -258,9 +258,18 @@ fig.save_figure('/tmp/pplot.png')"]
         b-dist (euclidian-distance bx by x y)]
     (if (<= a-dist b-dist) a b)))
 
+
 (defn ch09-ml-toy
   "See listings 9-3 through 9-6.
-   Use r? true to use the same test selection that R generates."
+   Use r? true to use the same test selection that R generates.
+
+   FYI:
+   (incanter.stats/summary
+    (incanter.core/dataset
+     [:accuracy]
+     (take 300
+           (repeatedly r-incantations.core/ch09-ml-toy))))
+   ; => ({:col :accuracy, :min 0.8292683, :max 0.9756098, :mean 0.9070886662572523, :median 0.9024389982223511, :is-numeric true})"
   [& {:keys [r?] :or [false]}]
   (let [memproc (read-memproc-data)
         n (count (:rows memproc))
@@ -311,7 +320,9 @@ fig.save_figure('/tmp/pplot.png')"]
 (defn ch09-ml-toy2
   "Same Euclidian distance basis as ch09-ml-toy, but does
    leave-one-out cross-validation.
-   http://en.wikipedia.org/wiki/Cross-validation_(statistics)#Leave-one-out_cross-validation"
+   http://en.wikipedia.org/wiki/Cross-validation_(statistics)#Leave-one-out_cross-validation
+
+   FYI: accuracy is (deterministically) 0.9068826"
   []
   (let [memproc (read-memproc-data)
         n (count (:rows memproc))

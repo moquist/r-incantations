@@ -259,7 +259,7 @@ fig.save_figure('/tmp/pplot.png')"]
     (if (<= a-dist b-dist) a b)))
 
 
-(defn ch09-ml-toy
+(defn ch09-ml-with-one-third-test
   "See listings 9-3 through 9-6.
    Use r? true to use the same test selection that R generates.
 
@@ -302,8 +302,52 @@ fig.save_figure('/tmp/pplot.png')"]
                      float)]
     accuracy))
 
-(defn ch09-ml-test [data test-sel]
-  (let [test-data (-> (incanter.core/sel data :rows [test-sel] :cols [:proc :mem :state])
+(defn ch09-ml-null-model
+  "This is a null-model for the Euclidian-distance ML algorithm from
+  the book, prepped for leave-one-out validation.
+
+   * Use with ch09-ml-validate.
+   * Assumes test-sel is a single row index.
+
+   Description and Rationalization for this model:
+     The memproc data has already been normalized (z-scores), and it's
+     clear (from the scatterplot, see results of (ch09-01)) that
+     normal machines have lower proc/mem usage numbers.
+
+     Null model: if the mean of proc/mem for the system we're testing
+     is greater than the mean of proc/mem for our test data, call it
+     \"Infected\", else \"Normal\".
+
+   * Result: accuracy is 0.757085"
+  [data test-sel]
+  (let [test-data (-> (incanter.core/sel data
+                                         :rows [test-sel]
+                                         :cols [:proc :mem :state])
+                      :rows
+                      first)
+        test-mean (incanter.stats/mean [(:proc test-data) (:mem test-data)])
+        training-data (incanter.core/sel data :except-rows [test-sel])
+        tr-mean-proc (incanter.stats/mean
+                      (incanter.core/sel training-data :cols :proc))
+        tr-mean-mem (incanter.stats/mean
+                     (incanter.core/sel training-data :cols :mem))
+        tr-mean (incanter.stats/mean [tr-mean-proc tr-mean-mem])]
+    (= (:state test-data)
+       (if (< tr-mean test-mean)
+         "Infected"
+         "Normal"))))
+
+(defn ch09-ml-book
+  "This is same Euclidian-distance ML algorithm from the book, prepped
+   for leave-one-out validation.
+
+   * Use with ch09-ml-validate.
+   * Assumes test-sel is a single row index.
+   * Result: accuracy is (deterministically) 0.9068826"
+  [data test-sel]
+  (let [test-data (-> (incanter.core/sel data
+                                         :rows [test-sel]
+                                         :cols [:proc :mem :state])
                       :rows
                       first)
         training-data (incanter.core/sel data :except-rows [test-sel])
@@ -317,18 +361,18 @@ fig.save_figure('/tmp/pplot.png')"]
         "Normal" tr-norm-proc-mean tr-norm-mem-mean
         (:proc test-data) (:mem test-data)))))
 
-(defn ch09-ml-toy2
-  "Same Euclidian distance basis as ch09-ml-toy, but does
-   leave-one-out cross-validation.
-   http://en.wikipedia.org/wiki/Cross-validation_(statistics)#Leave-one-out_cross-validation
+(defn ch09-ml-validate
+  "Does leave-one-out cross-validation on memproc data.
+   http://en.wikipedia.org/wiki/Cross-validation_(statistics)#Leave-one-out_cross-validation.
 
-   FYI: accuracy is (deterministically) 0.9068826"
-  []
+   ex: (ch09-ml-validate ch09-ml-null-model)
+   ex: (ch09-ml-validate ch09-ml-book)"
+  [ml-model-fn]
   (let [memproc (read-memproc-data)
         n (count (:rows memproc))
         test-size (dec n)
         tf-results (-> (for [test-sel (range n)]
-                         (ch09-ml-test memproc test-sel))
+                         (ml-model-fn memproc test-sel))
                        frequencies)]
     (float (/ (tf-results true) n))))
 

@@ -9,6 +9,9 @@ reading [Data-Driven Security, by Jacobs and
 Rudis](http://www.amazon.com/Data-Driven-Security-Analysis-Visualization-Dashboards/dp/1118793722).
 I recommend the book.
 
+This is experimentation/learning code -- all you can really do with this project
+is try out bits of ```src/r_incantations/core.clj``` in a REPL.
+
 ## Do I need to download stuff from the book to make this code work at all? ##
 Various bits of this code currently assume you have downloaded the
 code and data files for the book and placed them in this repo's top
